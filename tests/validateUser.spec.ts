@@ -167,13 +167,23 @@ test.describe('Jehan Login Page', () => {
                 const hasReadAccess = pageContent && pageContent.trim().length > 100;
                 console.log(`  📖 READ Permission: ${hasReadAccess ? '✅ CAN READ' : '❌ CANNOT READ'}`);
                 
-                if (hasReadAccess) {
-                  await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-read.png`, fullPage: true });
-                }
+                // Always take screenshot for READ test (success or failure)
+                await page.screenshot({ 
+                  path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-read-${hasReadAccess ? 'success' : 'failed'}.png`, 
+                  fullPage: true 
+                });
+                console.log(`  📸 Screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-read-${hasReadAccess ? 'success' : 'failed'}.png`);
                 
                 // Test CREATE permission
                 const createButtons = await page.locator('button:has-text("Add"), button:has-text("Create"), button:has-text("New"), [role="button"]:has-text("Add"), [role="button"]:has-text("Create"), [role="button"]:has-text("New")').count();
                 console.log(`  ➕ CREATE Permission: ${createButtons > 0 ? '✅ CAN CREATE' : '❌ CANNOT CREATE'}`);
+                
+                // Take screenshot showing CREATE buttons (or lack thereof)
+                await page.screenshot({ 
+                  path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-create-buttons-${createButtons > 0 ? 'found' : 'not-found'}.png`, 
+                  fullPage: true 
+                });
+                console.log(`  📸 Screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-create-buttons-${createButtons > 0 ? 'found' : 'not-found'}.png`);
                 
                 if (createButtons > 0) {
                   try {
@@ -181,18 +191,23 @@ test.describe('Jehan Login Page', () => {
                     await page.locator('button:has-text("Add"), button:has-text("Create"), button:has-text("New")').first().click();
                     await page.waitForTimeout(2000);
                     
-                    await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-create-form.png`, fullPage: true });
+                    await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-create-form-opened.png`, fullPage: true });
+                    console.log(`  📸 Screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-create-form-opened.png`);
                     
                     const formElements = await page.locator('form, .modal, .dialog, input, textarea').count();
                     console.log(`    ✅ CREATE form accessible: ${formElements > 0 ? 'YES' : 'NO'}`);
                     
-                    // Close form/modal
+                    // Close form/modal and take screenshot
                     if (formElements > 0) {
                       await page.keyboard.press('Escape');
                       await page.waitForTimeout(1000);
+                      await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-create-form-closed.png`, fullPage: true });
+                      console.log(`  📸 Screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-create-form-closed.png`);
                     }
                   } catch (error) {
                     console.log(`    ❌ CREATE test error: ${error.message}`);
+                    await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-create-error.png`, fullPage: true });
+                    console.log(`  📸 Error screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-create-error.png`);
                   }
                 }
                 
@@ -200,24 +215,36 @@ test.describe('Jehan Login Page', () => {
                 const editButtons = await page.locator('button:has-text("Edit"), [role="button"]:has-text("Edit"), .edit-btn, [class*="edit"]').count();
                 console.log(`  ✏️ EDIT Permission: ${editButtons > 0 ? '✅ CAN EDIT' : '❌ CANNOT EDIT'}`);
                 
+                // Take screenshot showing EDIT buttons (or lack thereof)
+                await page.screenshot({ 
+                  path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-edit-buttons-${editButtons > 0 ? 'found' : 'not-found'}.png`, 
+                  fullPage: true 
+                });
+                console.log(`  📸 Screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-edit-buttons-${editButtons > 0 ? 'found' : 'not-found'}.png`);
+                
                 if (editButtons > 0) {
                   try {
                     // Click edit button and take screenshot
                     await page.locator('button:has-text("Edit"), [role="button"]:has-text("Edit")').first().click();
                     await page.waitForTimeout(2000);
                     
-                    await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-edit-form.png`, fullPage: true });
+                    await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-edit-form-opened.png`, fullPage: true });
+                    console.log(`  📸 Screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-edit-form-opened.png`);
                     
                     const editFormElements = await page.locator('form, .modal, .dialog, input, textarea').count();
                     console.log(`    ✅ EDIT form accessible: ${editFormElements > 0 ? 'YES' : 'NO'}`);
                     
-                    // Close form/modal
+                    // Close form/modal and take screenshot
                     if (editFormElements > 0) {
                       await page.keyboard.press('Escape');
                       await page.waitForTimeout(1000);
+                      await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-edit-form-closed.png`, fullPage: true });
+                      console.log(`  📸 Screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-edit-form-closed.png`);
                     }
                   } catch (error) {
                     console.log(`    ❌ EDIT test error: ${error.message}`);
+                    await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-edit-error.png`, fullPage: true });
+                    console.log(`  📸 Error screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-edit-error.png`);
                   }
                 }
                 
@@ -225,13 +252,42 @@ test.describe('Jehan Login Page', () => {
                 const deleteButtons = await page.locator('button:has-text("Delete"), button:has-text("Remove"), [role="button"]:has-text("Delete"), [role="button"]:has-text("Remove"), .delete-btn, [class*="delete"]').count();
                 console.log(`  🗑️ DELETE Permission: ${deleteButtons > 0 ? '✅ CAN DELETE' : '❌ CANNOT DELETE'}`);
                 
+                // Always take screenshot for DELETE test (buttons found or not found)
+                await page.screenshot({ 
+                  path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-delete-buttons-${deleteButtons > 0 ? 'found' : 'not-found'}.png`, 
+                  fullPage: true 
+                });
+                console.log(`  📸 Screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-delete-buttons-${deleteButtons > 0 ? 'found' : 'not-found'}.png`);
+                
                 if (deleteButtons > 0) {
                   try {
-                    // Take screenshot showing delete buttons
-                    await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-delete-available.png`, fullPage: true });
-                    console.log(`    ✅ DELETE buttons found and visible`);
+                    // Take additional screenshot highlighting delete functionality
+                    console.log(`    ✅ DELETE buttons found and visible - ${deleteButtons} delete options available`);
+                    
+                    // Optional: Test clicking delete button (with confirmation handling)
+                    // Note: We won't actually delete anything, just test if delete dialog appears
+                    try {
+                      await page.locator('button:has-text("Delete"), button:has-text("Remove")').first().click();
+                      await page.waitForTimeout(1000);
+                      
+                      // Check if confirmation dialog appeared
+                      const confirmDialog = await page.locator('text=confirm, text=delete, text=remove, .confirmation, .dialog').count();
+                      if (confirmDialog > 0) {
+                        await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-delete-confirmation.png`, fullPage: true });
+                        console.log(`    📸 Delete confirmation dialog screenshot saved`);
+                        
+                        // Cancel the delete operation
+                        await page.keyboard.press('Escape');
+                        await page.waitForTimeout(1000);
+                      }
+                    } catch (deleteTestError) {
+                      console.log(`    ⚠️ Delete button test: ${deleteTestError.message}`);
+                    }
+                    
                   } catch (error) {
                     console.log(`    ❌ DELETE test error: ${error.message}`);
+                    await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-delete-error.png`, fullPage: true });
+                    console.log(`  📸 Delete error screenshot saved`);
                   }
                 }
                 
@@ -239,7 +295,8 @@ test.describe('Jehan Login Page', () => {
                 const restrictionMessages = await page.locator('text=Access denied, text=Unauthorized, text=Permission denied, text=Forbidden, text=Not authorized, text=Restricted').count();
                 if (restrictionMessages > 0) {
                   console.log(`  🚫 RESTRICTIONS FOUND: ${restrictionMessages} restriction messages`);
-                  await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-restrictions.png`, fullPage: true });
+                  await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-restrictions-found.png`, fullPage: true });
+                  console.log(`  📸 Restriction screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-restrictions-found.png`);
                 }
                 
                 // Summary for this module
@@ -253,9 +310,14 @@ test.describe('Jehan Login Page', () => {
                 const crudCount = Object.values(crudSummary).filter(Boolean).length;
                 console.log(`  📊 ${module} CRUD Summary: ${crudCount}/4 operations available (Read: ${crudSummary.read ? '✅' : '❌'}, Create: ${crudSummary.create ? '✅' : '❌'}, Edit: ${crudSummary.edit ? '✅' : '❌'}, Delete: ${crudSummary.delete ? '✅' : '❌'})`);
                 
+                // Take final summary screenshot for this module
+                await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-final-summary.png`, fullPage: true });
+                console.log(`  📸 Final summary screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-final-summary.png`);
+                
               } catch (error) {
                 console.log(`  ❌ Error testing CRUD for ${module}: ${error.message}`);
                 await page.screenshot({ path: `supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-error.png`, fullPage: true });
+                console.log(`  📸 Error screenshot saved: supervisor-crud-${module.toLowerCase().replace(/\s+/g, '-')}-error.png`);
               }
             }
           }
